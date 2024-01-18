@@ -13,7 +13,7 @@ public class ChatServer {
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clients.add(clientHandler);
 
-                new Thread(clientHandler).start();
+                new Thread(clientHandler).start(); // каждый пользователь в отдельном потоке
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -21,16 +21,15 @@ public class ChatServer {
     }
 
     static class ClientHandler implements Runnable, Serializable {
-        private static final long serialVersionUID = 1L;
-
-        private transient Socket clientSocket;
-        private transient BufferedReader reader;
-        private transient PrintWriter writer;
+        private  Socket clientSocket;
+        private  BufferedReader reader;
+        private  PrintWriter writer;
         private String username;
 
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
             try {
+                //инициализация переменных для ввода-вывода из потока клиентского сокета
                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 writer = new PrintWriter(clientSocket.getOutputStream(), true);
             } catch (IOException e) {
@@ -41,6 +40,7 @@ public class ChatServer {
         @Override
         public void run() {
             try {
+                //чтение имени пользователя от клиента
                 username = reader.readLine();
                 broadcast(username + " joined the chat.", null);
 
@@ -52,6 +52,7 @@ public class ChatServer {
                 e.printStackTrace();
             } finally {
                 try {
+                    //удаление клиента при закрытии приложения
                     clients.remove(this);
                     clientSocket.close();
                 } catch (IOException e) {
@@ -60,9 +61,9 @@ public class ChatServer {
             }
         }
 
-        private synchronized void broadcast(String message, ClientHandler sender) {
-            for (ClientHandler client : clients) {
-                if (client != sender) {
+        private void broadcast(String message, ClientHandler sender) {
+            for (ClientHandler client : clients) { // перебор всех пользователей
+                if (client != sender) { //исключение из отправки самого отправителя
                     try {
                         PrintWriter clientWriter = new PrintWriter(client.clientSocket.getOutputStream(), true);
                         clientWriter.println(message);

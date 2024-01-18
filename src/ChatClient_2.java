@@ -5,8 +5,9 @@ public class ChatClient_2 {
     public static void main(String[] args) {
         try {
             Socket socket = new Socket("localhost", 8888);
-
+            // для чтения ввода с консоли
             BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
+            //для записи данных в выходной поток
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 
             System.out.print("Enter your username: ");
@@ -15,10 +16,11 @@ public class ChatClient_2 {
 
             writeUsernameToFile(username);
 
-            new Thread(() -> {
+            new Thread(() -> { // поток для чтения сообщений от сервера
                 try {
                     BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String serverMessage;
+                    //цикл для чтения сообщений
                     while ((serverMessage = serverReader.readLine()) != null) {
                         System.out.println(serverMessage);
                     }
@@ -28,7 +30,7 @@ public class ChatClient_2 {
             }).start();
 
             String message;
-            while (true) {
+            while (true) { //цикл для отправки сообщений
                 message = consoleReader.readLine();
                 writer.println(message);
             }
