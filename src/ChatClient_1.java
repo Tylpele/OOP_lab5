@@ -1,5 +1,5 @@
 import java.io.*;
-import java.net.Socket; // Import the Socket class
+import java.net.Socket;
 
 public class ChatClient_1 {
     public static void main(String[] args) {
@@ -13,7 +13,6 @@ public class ChatClient_1 {
             String username = consoleReader.readLine();
             writer.println(username);
 
-            // Write username to file
             writeUsernameToFile(username);
 
             new Thread(() -> {
